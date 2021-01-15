@@ -406,14 +406,14 @@ function update() {
 
         forceLocation.x = cursorCurrentLocation.x;
         forceLocation.y = cursorCurrentLocation.y;
-        forceLocation.radius = 5.0;
+        forceLocation.radius = 16.0;
 
         switch (cursorMode) {
 
         // Left button to add dye
         case 0:
-            forceVector.x = cursorVelocity.x;
-            forceVector.y = cursorVelocity.y;
+            forceVector.x = cursorVelocity.x * 4.0;
+            forceVector.y = cursorVelocity.y * 4.0;
             break;
 
         // Right button to apply force
@@ -441,7 +441,7 @@ function update() {
     current ^= 1;
 
     // Apply a few optimization steps
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < 10; ++i) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[current ^ 1]);
         gl.useProgram(pass2Program);
         gl.uniform1i(gl.getUniformLocation(pass2Program, "u_texture"), current);
