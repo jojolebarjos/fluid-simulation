@@ -28,7 +28,48 @@
   </canvas>
   
   <script>
-    simulate(document.getElementById("canvas"));
+    const canvas = document.getElementById("canvas");
+    const simulation = new Simulation(canvas);
+    
+    // Prevent context menu
+    canvas.addEventListener("contextmenu", (e) => {e.preventDefault()});
+    
+    canvas.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      simulation.cursorMode = e.button;
+      simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
+    });
+    
+    canvas.addEventListener("pointermove", (e) => {
+      e.preventDefault();
+      if (simulation.cursorMode >= 0) {
+        simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
+      }
+    });
+    
+    canvas.addEventListener("pointerup", (e) => {
+      e.preventDefault();
+      simulation.cursorMode = -1;
+      simulation.cursorCurrentLocation = null;
+      simulation.cursorPreviousLocation = null;
+    });
+    
+    window.onkeydown = (e) => {
+      if (e.key == "m") {
+        simulation.renderMode ^= 1;
+        console.log("Switch to mode " + renderMode);
+      }
+    };
+    
+    function update() {
+      const dt = 1000.0 / 60.0;
+      simulation.update();
+      window.setTimeout(update, dt);
+      // TODO maybe use window.requestAnimationFrame?
+    }
+    
+    update();
+    
   </script>
 
 </body>
