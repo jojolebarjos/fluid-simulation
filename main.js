@@ -1,4 +1,7 @@
 
+// TODO add "draw force" shader
+// TODO add "draw ink" shader
+
 const PASS1_VS =
 `#version 300 es
 layout(location = 0) in vec2 pos;
@@ -167,7 +170,9 @@ class Simulation {
     // Enable required extension
     if (!gl.getExtension("EXT_color_buffer_float"))
       throw Error("EXT_color_buffer_float not available");
-  
+    
+    // TODO put these object creation in dedicated function (and handle webglcontextlost and webglcontextrestored)
+    
     this.pass1Program = createProgram(gl, PASS1_VS, PASS1_FS);
     this.pass2Program = createProgram(gl, PASS2_VS, PASS2_FS);
     this.pass3Program = createProgram(gl, PASS3_VS, PASS3_FS);
@@ -248,7 +253,7 @@ class Simulation {
         break;
 
       // Right button to apply force
-      case 2:
+      case 1:
         feed = 1.0;
         break;
       }

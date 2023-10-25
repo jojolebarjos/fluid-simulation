@@ -12,9 +12,23 @@
     margin-left: auto;
     margin-right: auto;
     display: block;
+    border: 1px solid #d3d3d3;
+
+    /* Size is hardcoded, in this example */
     width: 480px;
     height: 480px;
-    border: 1px solid #d3d3d3;
+
+    /* Make sure touch events are prevented */
+    touch-action: none;
+
+    /* Show red lines on error */
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      #f00 10px,
+      #f00 20px
+    );
   }
   </style>
 
@@ -23,44 +37,67 @@
 </head>
 <body>
 
+  <input type="checkbox" id="render-checkbox">
+  <label for="render-checkbox">Raw render mode</label>
+
+  <input type="checkbox" id="control-checkbox">
+  <label for="control-checkbox">Swap control mode</label>
+
   <canvas id="canvas" width="480" height="480">
     Your browser does not support the HTML5 canvas tag.
   </canvas>
-  
+
   <script>
     const canvas = document.getElementById("canvas");
+    const renderCheckbox = document.getElementById("render-checkbox");
+    const controlCheckbox = document.getElementById("control-checkbox");
     const simulation = new Simulation(canvas);
-    
+
     // Prevent context menu
-    canvas.addEventListener("contextmenu", (e) => {e.preventDefault()});
-    
+    canvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+
+    // Start stroke, with selected mode
     canvas.addEventListener("pointerdown", (e) => {
       e.preventDefault();
-      simulation.cursorMode = e.button;
+      simulation.cursorMode = -1;
+
+      // Primary button
+      if (event.pointerType == "touch" || e.button == 0) {
+        simulation.cursorMode = 1 ^ controlCheckbox.checked;
+      }
+
+      // Secondary button
+      else if (e.button == 2) {
+        simulation.cursorMode = 0 ^ controlCheckbox.checked;
+      }
+
       simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
     });
-    
+
+    // Update stroke
     canvas.addEventListener("pointermove", (e) => {
       e.preventDefault();
       if (simulation.cursorMode >= 0) {
         simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
       }
     });
-    
+
+    // End stroke
     canvas.addEventListener("pointerup", (e) => {
       e.preventDefault();
       simulation.cursorMode = -1;
       simulation.cursorCurrentLocation = null;
       simulation.cursorPreviousLocation = null;
     });
-    
-    window.onkeydown = (e) => {
-      if (e.key == "m") {
-        simulation.renderMode ^= 1;
-        console.log("Switch to mode " + renderMode);
-      }
-    };
-    
+
+    // Toggle render mode
+    renderCheckbox.addEventListener("click", (e) => {
+        simulation.renderMode = renderCheckbox.checked ? 1 : 0;
+    });
+
+    // Simulation step
     function update() {
       const dt = 1000.0 / 60.0;
       simulation.update();
@@ -69,6 +106,8 @@
     }
     
     update();
+    
+    // simulation.gl.getExtension("WEBGL_lose_context").loseContext();
     
   </script>
 
