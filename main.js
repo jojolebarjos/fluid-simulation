@@ -214,13 +214,12 @@ class Simulation {
     this.cursorPreviousLocation = null;
     this.cursorVelocity = null;
     this.renderMode = 0;
-
   }
-  
+
   // Executed at every frame
   update() {
     const { gl } = this;
-      
+
     const dt = 1000.0 / 60.0;
 
     // Update mouse tracker
@@ -385,9 +384,3 @@ function createFramebuffer(gl, texture) {
   }
   return framebuffer;
 }
-
-
-// First pass: advect and apply forces
-// Second pass: apply a step of Jacobi method, to solve pressure equations
-// Third pass: compute final velocity and advect dye
-// Render pass: show ink

@@ -15,8 +15,8 @@
     border: 1px solid #d3d3d3;
 
     /* Size is hardcoded, in this example */
-    width: 480px;
-    height: 480px;
+    width: 50vw;
+    height: 50vw;
 
     /* Make sure touch events are prevented */
     touch-action: none;
@@ -58,6 +58,14 @@
       e.preventDefault();
     });
 
+    // Convert coordinates
+    function getOffsetLocation(e) {
+      return {
+        x: e.offsetX * canvas.width / canvas.clientWidth,
+        y: (canvas.clientHeight - e.offsetY) * canvas.height / canvas.clientHeight
+      };
+    }
+
     // Start stroke, with selected mode
     canvas.addEventListener("pointerdown", (e) => {
       e.preventDefault();
@@ -73,14 +81,14 @@
         simulation.cursorMode = 0 ^ controlCheckbox.checked;
       }
 
-      simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
+      simulation.cursorCurrentLocation = getOffsetLocation(e);
     });
 
     // Update stroke
     canvas.addEventListener("pointermove", (e) => {
       e.preventDefault();
       if (simulation.cursorMode >= 0) {
-        simulation.cursorCurrentLocation = {x: e.offsetX, y: canvas.height - e.offsetY};
+        simulation.cursorCurrentLocation = getOffsetLocation(e);
       }
     });
 
@@ -98,17 +106,18 @@
     });
 
     // Simulation step
+    // Note: using `requestAnimationFrame` does not guarantee a known fixed rate
     function update() {
-      const dt = 1000.0 / 60.0;
       simulation.update();
-      window.setTimeout(update, dt);
-      // TODO maybe use window.requestAnimationFrame?
+      window.requestAnimationFrame(update);
     }
-    
+
+    // Start the simulation and rendering loop
     update();
-    
+
+    // Manually call this to break the WebGL context
     // simulation.gl.getExtension("WEBGL_lose_context").loseContext();
-    
+
   </script>
 
 </body>
